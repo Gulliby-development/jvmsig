@@ -34,7 +34,8 @@ class CliTest {
             "       jvmsig check [--var NAME]... FILE...\n" +
             "       jvmsig erase SIGNATURE...\n" +
             "       jvmsig slots [--static] SIGNATURE...\n" +
-            "       jvmsig jni CLASS METHOD [DESCRIPTOR]\n"
+            "       jvmsig jni CLASS METHOD [DESCRIPTOR]\n" +
+            "       jvmsig --version\n"
         val cases = listOf(
             ExpectedRun(emptyList(), "", usage, 2),
             ExpectedRun(
