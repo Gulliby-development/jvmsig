@@ -32,6 +32,7 @@ jvmsig check [--var NAME]... FILE...
 jvmsig erase SIGNATURE...
 jvmsig slots [--static] SIGNATURE...
 jvmsig jni CLASS METHOD [DESCRIPTOR]
+jvmsig --version
 ```
 
 - **`show`** reads each field, method, or class signature and displays Java-style text by default. `--kotlin` selects a Kotlin-like display form; it is for reading signatures, not necessarily compilable Kotlin. `--short` drops the package path from the first class name, and `--name NAME` supplies a method name in the display.
@@ -39,6 +40,15 @@ jvmsig jni CLASS METHOD [DESCRIPTOR]
 - **`erase`** prints the JVM descriptor after generic type erasure. Type variables use the first bound declared in the same signature, or `java/lang/Object` when no usable bound is available.
 - **`slots`** accepts method signatures and prints the local-variable slots used by the receiver and arguments, along with erased types and the return type. The receiver occupies slot 0 unless `--static` is given; `long` and `double` arguments occupy two slots.
 - **`jni`** prints the JNI C symbol for `CLASS` and `METHOD`. Supplying the optional method `DESCRIPTOR` adds the overloaded-name suffix derived from its erased parameter types.
+
+`jvmsig --version` (or `-V`), as the first argument, prints `jvmsig` and the project version on one line and exits with status `0`:
+
+```text
+$ jvmsig --version
+jvmsig 0.1.0
+```
+
+The version is the `version` of `build.gradle.kts`; the build copies it into the `version.properties` resource, from which the program reads it.
 
 Exit status is `0` when the requested work succeeds, `1` when one or more signatures have problems, and `2` for command-line errors or unreadable/undecodable input. Signature errors include the operand or file line, a one-based column, and a diagnostic code.
 

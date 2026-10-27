@@ -2,6 +2,7 @@ package io.github.gulliby.jvmsig.cmd
 
 import io.github.gulliby.jvmsig.base.Failure
 import io.github.gulliby.jvmsig.base.Output
+import io.github.gulliby.jvmsig.base.Version
 
 object Cli {
     fun run(args: List<String>, stdin: Lazy<ByteArray>, out: Output): Int {
@@ -11,6 +12,10 @@ object Cli {
         }
         if (args[0] == "--help" || args[0] == "-h") {
             writeUsage(out::outLine)
+            return 0
+        }
+        if (args[0] == "--version" || args[0] == "-V") {
+            out.outLine("jvmsig ${Version.text}")
             return 0
         }
 
@@ -39,5 +44,6 @@ object Cli {
         "       jvmsig check [--var NAME]... FILE...\n" +
         "       jvmsig erase SIGNATURE...\n" +
         "       jvmsig slots [--static] SIGNATURE...\n" +
-        "       jvmsig jni CLASS METHOD [DESCRIPTOR]"
+        "       jvmsig jni CLASS METHOD [DESCRIPTOR]\n" +
+        "       jvmsig --version"
 }
