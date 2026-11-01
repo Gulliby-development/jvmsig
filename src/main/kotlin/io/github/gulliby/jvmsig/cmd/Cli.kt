@@ -41,7 +41,7 @@ object Cli {
     }
 
     private const val USAGE = "usage: jvmsig show [--kotlin] [--short] [--name NAME] SIGNATURE...\n" +
-        "       jvmsig check [--var NAME]... FILE...\n" +
+        "       jvmsig check [--var NAME]... [--max-problems N] FILE...\n" +
         "       jvmsig erase SIGNATURE...\n" +
         "       jvmsig slots [--static] SIGNATURE...\n" +
         "       jvmsig jni CLASS METHOD [DESCRIPTOR]\n" +

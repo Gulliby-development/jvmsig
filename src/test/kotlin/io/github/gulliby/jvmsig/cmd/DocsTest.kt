@@ -35,7 +35,7 @@ class DocsTest {
         assertTrue(readme.contains("`1` when one or more signatures have problems"))
         assertTrue(readme.contains("`2` for command-line errors"))
         assertTrue(readme.contains("jvmsig show [--kotlin] [--short] [--name NAME] SIGNATURE..."))
-        assertTrue(readme.contains("jvmsig check [--var NAME]... FILE..."))
+        assertTrue(readme.contains("jvmsig check [--var NAME]... [--max-problems N] FILE..."))
         assertTrue(readme.contains("jvmsig erase SIGNATURE..."))
         assertTrue(readme.contains("jvmsig slots [--static] SIGNATURE..."))
         assertTrue(readme.contains("jvmsig jni CLASS METHOD [DESCRIPTOR]"))

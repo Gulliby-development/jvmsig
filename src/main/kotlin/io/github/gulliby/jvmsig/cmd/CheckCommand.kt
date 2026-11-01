@@ -11,7 +11,10 @@ import io.github.gulliby.jvmsig.read.SigReader
 
 object CheckCommand {
     fun run(args: List<String>, stdin: Lazy<ByteArray>, out: Output): Int {
-        val options = Options.parse(args, mapOf("--var" to Options.Kind.MULTI))
+        val options = Options.parse(
+            args,
+            mapOf("--var" to Options.Kind.MULTI, "--max-problems" to Options.Kind.VALUE)
+        )
         if (options.operands.isEmpty()) {
             throw Failure(2, "check needs at least one file")
         }
@@ -23,9 +26,20 @@ object CheckCommand {
             }
         }
 
+        val maxProblems = options.values["--max-problems"]?.let { text ->
+            if (!MAX_PROBLEMS.matches(text)) {
+                throw Failure(2, "invalid --max-problems value: $text")
+            }
+            text.toInt()
+        }
+
         var signatureCount = 0
         var problemCount = 0
+        var stopped = false
         for (file in options.operands) {
+            if (stopped) {
+                break
+            }
             val label = if (file == "-") "<stdin>" else file
             val bytes = if (file == "-") stdin.value else Inputs.read(file)
             val text = Inputs.decode(bytes, label).removePrefix("\uFEFF")
@@ -44,13 +58,18 @@ object CheckCommand {
                 if (problem != null) {
                     out.outLine("$label:${index + 1}:${problem.col}: ${problem.code} ${problem.text}")
                     problemCount++
+                    if (maxProblems != null && problemCount >= maxProblems) {
+                        stopped = true
+                        break
+                    }
                 }
             }
         }
 
+        val stoppedNote = if (stopped) " (stopped after $problemCount ${Text.plural(problemCount, "problem")})" else ""
         out.outLine(
             "checked $signatureCount ${Text.plural(signatureCount, "signature")}, " +
-                "$problemCount ${Text.plural(problemCount, "problem")}"
+                "$problemCount ${Text.plural(problemCount, "problem")}$stoppedNote"
         )
         return if (problemCount == 0) 0 else 1
     }
@@ -75,4 +94,6 @@ object CheckCommand {
     }
 
     private const val FORBIDDEN_VARIABLE_CHARACTERS = ".;[/<>:"
+
+    private val MAX_PROBLEMS = Regex("[1-9][0-9]{0,2}")
 }

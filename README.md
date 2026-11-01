@@ -28,7 +28,7 @@ The command transcripts below use POSIX shell syntax. In particular, `printf` an
 
 ```text
 jvmsig show [--kotlin] [--short] [--name NAME] SIGNATURE...
-jvmsig check [--var NAME]... FILE...
+jvmsig check [--var NAME]... [--max-problems N] FILE...
 jvmsig erase SIGNATURE...
 jvmsig slots [--static] SIGNATURE...
 jvmsig jni CLASS METHOD [DESCRIPTOR]
@@ -36,7 +36,7 @@ jvmsig --version
 ```
 
 - **`show`** reads each field, method, or class signature and displays Java-style text by default. `--kotlin` selects a Kotlin-like display form; it is for reading signatures, not necessarily compilable Kotlin. `--short` drops the package path from the first class name, and `--name NAME` supplies a method name in the display.
-- **`check`** reads signatures from files, one signature per non-empty, non-comment line, and reports syntax and semantic problems. A line beginning with `#` is a comment. Repeat `--var NAME` to declare enclosing type variables that are not declared by the signature itself.
+- **`check`** reads signatures from files, one signature per non-empty, non-comment line, and reports syntax and semantic problems. A line beginning with `#` is a comment. Repeat `--var NAME` to declare enclosing type variables that are not declared by the signature itself. `--max-problems N` (a whole number from 1 to 999) stops the check after the Nth problem has been reported: the signatures after it, in the same file and in later files, are neither read nor counted, and the last line says so.
 - **`erase`** prints the JVM descriptor after generic type erasure. Type variables use the first bound declared in the same signature, or `java/lang/Object` when no usable bound is available.
 - **`slots`** accepts method signatures and prints the local-variable slots used by the receiver and arguments, along with erased types and the return type. The receiver occupies slot 0 unless `--static` is given; `long` and `double` arguments occupy two slots.
 - **`jni`** prints the JNI C symbol for `CLASS` and `METHOD`. Supplying the optional method `DESCRIPTOR` adds the overloaded-name suffix derived from its erased parameter types.
@@ -74,6 +74,15 @@ Check a file created with `printf`:
 $ printf 'I\n' > ok.txt
 $ jvmsig check ok.txt
 checked 1 signature, 0 problems
+```
+
+Stop a check after the first problem (a file with one good and two bad signatures):
+
+```text
+$ printf 'I\nQ\nQ\n' > bad.txt
+$ jvmsig check --max-problems 1 bad.txt
+bad.txt:2:1: JS003 not a type: 'Q'
+checked 2 signatures, 1 problem (stopped after 1 problem)
 ```
 
 Erase an undeclared type variable:
